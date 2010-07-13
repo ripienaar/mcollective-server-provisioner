@@ -27,6 +27,7 @@ config file:
       filter: "/monitor1/"
       targets:
       - boxcar://rip@devco.net
+      - gcal://newservers
 
  1. Discover all nodes running the 'provision' agent
  1. Pick the first discovered node and start provisioning
@@ -39,6 +40,14 @@ config file:
  1. Does an initial puppet run with the 'bootstrap_puppet' action
  1. Does a 2nd puppet run via 'run_puppet' action.  This should remove the provision agent from the node
  1. Notifies my iPhone via boxcar
+ 1. Adds a calendar entry to my Google Calendar noting the time when the node was provisioned
+
+To do this we re-use a lot of existing agents:
+
+ 1. Your masters all need the puppetca agent
+ 1. Your nodes being provisioned need the provision agent, see agents subdir
+ 1. You need to have nagger deployed and the node should run the nagger agent
+ 1. You need some nagger plugins the boxcar and gcal ones are opensource
 
  Customizing
  -----------
