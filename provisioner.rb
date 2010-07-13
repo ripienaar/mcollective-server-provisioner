@@ -3,7 +3,13 @@
 require 'mcprovision'
 require 'pp'
 
-runner = MCProvision::Runner.new("etc/provisioner.yaml")
+if ARGV.size > 0
+    configfile = ARGV[0]
+else
+    configfile = "/etc/mcollective/provisioner.yaml"
+end
+
+runner = MCProvision::Runner.new(configfile)
 
 begin
     if runner.config.settings["daemonize"] || false
