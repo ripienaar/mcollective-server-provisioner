@@ -1,0 +1,14 @@
+--- 
+master: 
+  criteria: 
+  - ec2_placement_region
+  - country
+  filter: ""
+  agent: puppetca
+target: 
+  filter: ""
+  agent: provision
+notify:
+  filter: "/monitor1/"
+  targets:
+  - boxcar://rip@devco.net
