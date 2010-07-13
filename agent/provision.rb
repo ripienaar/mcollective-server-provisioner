@@ -51,9 +51,6 @@ module MCollective
 
             # does a run of puppet with --environment bootstrap or similar
             action "bootstrap_puppet" do
-                ENV["FACTER_environment"] = "bootstrap"
-                ::Facter.reset
-
                 reply[:output] = %x[/usr/sbin/puppetd --test --environment bootstrap --color=none --summarize]
                 reply[:exitcode] = $?.exitstatus
 
@@ -62,9 +59,6 @@ module MCollective
 
             # does a normal puppet run
             action "run_puppet" do
-                ENV.delete("FACTER_environment")
-                ::Facter.reset
-
                 reply[:output] = %x[/usr/sbin/puppetd --test --color=none --summarize]
                 reply[:exitcode] = $?.exitstatus
 

@@ -50,6 +50,9 @@ module MCProvision
             # Bootstrap it
             node.bootstrap
 
+            # Do final run
+            node.run_puppet
+
             @notifier.notify("Provisioned #{node.hostname} against #{chosen_master.hostname}", "New Node")
         end
 
