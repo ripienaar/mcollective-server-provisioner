@@ -1,39 +1,53 @@
 module MCProvision
     class Runner
+        attr_reader :config
+
         def initialize(configfile)
             @config = MCProvision::Config.new(configfile)
             @master = MCProvision::PuppetMaster.new(@config)
             @notifier = Notifier.new(@config)
+
+            Signal.trap("INT") do
+                MCProvision.info("Received INT signal, exiting.")
+                exit!
+            end
         end
 
         def run
-            Util.log("Starting runner")
+            begin
+                MCProvision.info("Starting runner")
 
-            loop do
-                Util.log("Looking for machines to provision")
-                provisionable = Nodes.new(@config.settings["target"]["agent"], @config.settings["target"]["filter"], @config)
+                loop do
+                    MCProvision.info("Looking for machines to provision")
+                    provisionable = Nodes.new(@config.settings["target"]["agent"], @config.settings["target"]["filter"], @config)
 
-                provisionable.nodes.each do |server|
-                    begin
-                        provision(server)
-                    rescue Exception => e
-                        Util.log("Could not provision node #{server.hostname}: #{e.class}: #{e}")
+                    provisionable.nodes.each do |server|
+                        begin
+                            provision(server)
+                        rescue Exception => e
+                            MCProvision.info("Could not provision node #{server.hostname}: #{e.class}: #{e}")
+                        end
                     end
-                end
 
-                sleep 5
+                    sleep 5
+                end
+            rescue SignalException => e
+            rescue Exception => e
+                MCProvision.info("Runner failed: #{e.class}: #{e}")
+                sleep 2
+                retry
             end
         end
 
         def provision(node)
             node_inventory = node.inventory
-            Util.log("Provisioning #{node.hostname} / #{node_inventory[:facts]['ipaddress_eth0']}")
+            MCProvision.info("Provisioning #{node.hostname} / #{node_inventory[:facts]['ipaddress_eth0']}")
 
             chosen_master, master_inventory = pick_master_from(@config.settings["master"]["criteria"], node_inventory[:facts])
 
             master_ip = master_inventory[:facts]['ipaddress']
 
-            Util.log("Provisioning node against #{chosen_master.hostname} / #{master_ip}")
+            MCProvision.info("Provisioning node against #{chosen_master.hostname} / #{master_ip}")
 
             # calls set_puppet_host
             node.set_puppet_host(master_ip)
@@ -81,7 +95,7 @@ module MCProvision
                         if master_facts.include?(fact)
                             # if they match, we have a winner
                             if master_facts[fact] == node[fact]
-                                Util.log("Picking #{master.hostname} for puppetmaster based on #{fact} == #{node[fact]}")
+                                MCProvision.info("Picking #{master.hostname} for puppetmaster based on #{fact} == #{node[fact]}")
                                 chosen_master = master
                             end
                         end

@@ -16,7 +16,21 @@ module MCProvision::Util
         result
     end
 
+    # Daemonize the current process
+    def self.daemonize
+        fork do
+            Process.setsid
+            exit if fork
+            Dir.chdir('/tmp')
+            STDIN.reopen('/dev/null')
+            STDOUT.reopen('/dev/null', 'a')
+            STDERR.reopen('/dev/null', 'a')
+
+            yield
+        end
+    end
+
     def self.log(msg)
-        puts("#{Time.now}> #{msg}")
+        MCProvision.debug(msg)
     end
 end

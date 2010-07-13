@@ -14,6 +14,9 @@ Each node more or less go through the following steps given the
 config file:
 
     --- 
+    logfile: /var/log/provisioner.log
+    loglevel: debug
+    daemonize: true
     master: 
       criteria: 
       - ec2_placement_region

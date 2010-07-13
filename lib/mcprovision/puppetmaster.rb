@@ -15,13 +15,13 @@ module MCProvision
 
         # Cleans a cert from all masters
         def clean_cert(certname)
-            Util.log("Clean certificate #{certname} from all masters")
+            MCProvision.info("Clean certificate #{certname} from all masters")
             @puppetca.clean(:certname => certname)
         end
 
         # Signs a cert on all masters
         def sign(certname)
-            Util.log("Signing certificate #{certname} on all masters")
+            MCProvision.info("Signing certificate #{certname} on all masters")
 
             @puppetca.list.each do |list|
                 if list[:data][:requests].include?(certname)

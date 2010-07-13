@@ -1,4 +1,7 @@
 --- 
+logfile: /tmp/provisioner
+loglevel: debug
+daemonize: true
 master: 
   criteria: 
   - ec2_placement_region

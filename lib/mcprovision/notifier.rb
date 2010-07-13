@@ -11,7 +11,7 @@ module MCProvision
         def notify(msg, subject)
             if @config.settings.include?("notify")
                 @config.settings["notify"]["targets"].each do |recipient|
-                    Util.log("Notifying #{recipient} of new node")
+                    MCProvision.info("Notifying #{recipient} of new node")
                     @rpc.sendmsg(:message => msg, :subject => subject, :recipient => recipient)
                 end
             end

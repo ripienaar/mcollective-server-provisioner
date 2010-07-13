@@ -26,19 +26,19 @@ module MCProvision
         # sets the ip of the puppet master host using the
         # set_puppet_host action on the node
         def set_puppet_host(ipaddress)
-            Util.log("Calling set_puppet_host with ip #{ipaddress}")
+            MCProvision.info("Calling set_puppet_host with ip #{ipaddress}")
             @node.custom_request("set_puppet_host", {:ipaddress => ipaddress}, @hostname, {"identity" => @hostname})
         end
 
         # calls the request_certificate action on the node being provisioned
         def send_csr
-            Util.log("Calling request_certificate")
+            MCProvision.info("Calling request_certificate")
             @node.custom_request("request_certificate", {}, @hostname, {"identity" => @hostname})
         end
 
         # calls the bootstrap_puppet action to do initial puppet run
         def bootstrap
-            Util.log("Calling bootstrap_puppet")
+            MCProvision.info("Calling bootstrap_puppet")
             result = @node.custom_request("bootstrap_puppet", {}, @hostname, {"identity" => @hostname})
 
             check_puppet_output(result.first[:data][:output].split("\n"))
@@ -46,7 +46,7 @@ module MCProvision
 
         # Do the final run of the client by calling run_puppet
         def run_puppet
-            Util.log("Calling run_puppet")
+            MCProvision.info("Calling run_puppet")
             result = @node.custom_request("run_puppet", {}, @hostname, {"identity" => @hostname})
 
             check_puppet_output(result.first[:data][:output].split("\n"))
