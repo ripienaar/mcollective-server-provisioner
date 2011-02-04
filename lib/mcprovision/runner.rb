@@ -25,7 +25,8 @@ module MCProvision
                         begin
                             provision(server)
                         rescue Exception => e
-                            MCProvision.info("Could not provision node #{server.hostname}: #{e.class}: #{e}")
+                            MCProvision.warn("Could not provision node #{server.hostname}: #{e.class}: #{e}")
+                            MCProvision.warn(e.backtrace.join("\n\t")) if @config.settings["loglevel"] == "debug"
                         end
                     end
 
@@ -33,7 +34,8 @@ module MCProvision
                 end
             rescue SignalException => e
             rescue Exception => e
-                MCProvision.info("Runner failed: #{e.class}: #{e}")
+                MCProvision.warn("Runner failed: #{e.class}: #{e}")
+                MCProvision.warn(e.backtrace.join("\n\t")) if @config.settings["loglevel"] == "debug"
                 sleep 2
                 retry
             end
@@ -41,33 +43,41 @@ module MCProvision
 
         def provision(node)
             node_inventory = node.inventory
-            MCProvision.info("Provisioning #{node.hostname} / #{node_inventory[:facts]['ipaddress_eth0']}")
+            node_ipaddress_fact = @config.settings["target"]["ipaddress_fact"]
+            master_ipaddress_fact = @config.settings["master"]["ipaddress_fact"]
+
+            raise "Could not determine node ip address from fact #{node_ipaddress_fact}" unless node_inventory[:facts].include?(node_ipaddress_fact)
+
+            steps = @config.settings["steps"].keys.select{|s| @config.settings["steps"][s] }
+
+            MCProvision.info("Provisioning #{node.hostname} / #{node_inventory[:facts][node_ipaddress_fact]} with steps #{steps.join ' '}")
 
             chosen_master, master_inventory = pick_master_from(@config.settings["master"]["criteria"], node_inventory[:facts])
 
-            master_ip = master_inventory[:facts]['ipaddress']
+            raise "Could not determine master ip address from fact #{master_ipaddress_fact}" unless master_inventory[:facts].include?(master_ipaddress_fact)
+            master_ip = master_inventory[:facts][master_ipaddress_fact]
 
             MCProvision.info("Provisioning node against #{chosen_master.hostname} / #{master_ip}")
 
             # calls set_puppet_host
-            node.set_puppet_host(master_ip)
+            node.set_puppet_host(master_ip) if @config.settings["steps"]["set_puppet_hostname"]
 
             # calls clean on all puppetmasters
-            @master.clean_cert(node.hostname)
+            @master.clean_cert(node.hostname) if @config.settings["steps"]["clean_node_certname"]
 
             # Gets the node to request a CSR
-            node.send_csr
+            node.send_csr if @config.settings["steps"]["send_node_csr"]
 
             # Sign it
-            @master.sign(node.hostname)
+            @master.sign(node.hostname) if @config.settings["steps"]["sign_node_csr"]
 
             # Bootstrap it
-            node.bootstrap
+            node.bootstrap if @config.settings["steps"]["puppet_bootstrap_stage"]
 
             # Do final run
-            node.run_puppet
+            node.run_puppet if @config.settings["steps"]["puppet_final_run"]
 
-            @notifier.notify("Provisioned #{node.hostname} against #{chosen_master.hostname}", "New Node")
+            @notifier.notify("Provisioned #{node.hostname} against #{chosen_master.hostname}", "New Node") if @config.settings["steps"]["notify"]
         end
 
         private

@@ -1,6 +1,6 @@
 module MCProvision
     class Node
-        attr_reader :hostname, :inventory
+        attr_reader :hostname
 
         def initialize(hostname, config, agent)
             @config = config

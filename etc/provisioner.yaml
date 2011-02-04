@@ -1,16 +1,26 @@
---- 
-logfile: /tmp/provisioner
+---
+logfile: /dev/stderr
 loglevel: debug
-daemonize: true
-master: 
-  criteria: 
+daemonize: false
+steps:
+  set_puppet_hostname: true
+  clean_node_certname: true
+  send_node_csr: true
+  sign_node_csr: true
+  puppet_bootstrap_stage: true
+  puppet_final_run: true
+  notify: true
+master:
+  criteria:
   - ec2_placement_region
   - country
   filter: ""
   agent: puppetca
-target: 
+  ipaddress_fact: ipaddress
+target:
   filter: ""
   agent: provision
+  ipaddress_fact: ipaddress
 notify:
   filter: "/monitor1/"
   targets:
