@@ -23,5 +23,6 @@ target:
   ipaddress_fact: ipaddress
 notify:
   filter: "/monitor1/"
+  agent: angelianotify
   targets:
   - boxcar://rip@devco.net

@@ -10,8 +10,13 @@ module MCProvision
 
         def notify(msg, subject)
             if @config.settings.include?("notify")
+                raise "No notification targets specified" unless @config.settings["notify"].include?("targets")
+                raise "No notification targets specified" if @config.settings["notify"]["targets"].empty?
+
                 @config.settings["notify"]["targets"].each do |recipient|
                     MCProvision.info("Notifying #{recipient} of new node")
+
+                    raise "Could not find any instances of the '#{@config.settings['notify']['agent']}' agent" if @rpc.discover.empty?
                     @rpc.sendmsg(:message => msg, :subject => subject, :recipient => recipient)
                 end
             end
@@ -19,9 +24,11 @@ module MCProvision
 
         private
         def setup
-            @rpc = rpcclient("naggernotify")
+            agent = @config.settings["notify"]["agent"] || "angelianotify"
+
+            @rpc = rpcclient(agent)
             @rpc.progress = false
-            @rpc.filter = Util.parse_filter("naggernotify", @config.settings["notify"]["filter"])
+            @rpc.filter = Util.parse_filter(agent, @config.settings["notify"]["filter"])
         end
     end
 end

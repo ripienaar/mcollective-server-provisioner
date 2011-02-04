@@ -41,6 +41,10 @@ module MCProvision
 
         private
         def setup
+            unless @config.settings["master"].include?("agent") && @config.settings["master"].include?("filter")
+                raise "The config file master section needs 'agent' and 'filter'"
+            end
+
             agent = @config.settings["master"]["agent"]
             @puppetca = rpcclient(agent)
             @puppetca.progress = false

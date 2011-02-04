@@ -43,8 +43,8 @@ module MCProvision
 
         def provision(node)
             node_inventory = node.inventory
-            node_ipaddress_fact = @config.settings["target"]["ipaddress_fact"]
-            master_ipaddress_fact = @config.settings["master"]["ipaddress_fact"]
+            node_ipaddress_fact = @config.settings["target"]["ipaddress_fact"] || "ipaddress"
+            master_ipaddress_fact = @config.settings["master"]["ipaddress_fact"] || "ipaddress"
 
             raise "Could not determine node ip address from fact #{node_ipaddress_fact}" unless node_inventory[:facts].include?(node_ipaddress_fact)
 
