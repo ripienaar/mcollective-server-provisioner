@@ -67,6 +67,8 @@ module MCollective
             end
 
             action "lock_deploy" do
+                reply.fail! "Already locked" if locked?
+
                 File.open(@lockfile, "w") {|f| f.puts Time.now}
 
                 reply[:lockfile] = @lockfile

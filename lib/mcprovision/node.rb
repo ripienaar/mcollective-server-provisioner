@@ -11,6 +11,16 @@ module MCProvision
             @inventory = fetch_inventory
         end
 
+        def lock
+            MCProvision.info("Creating lock file on node")
+            request("lock_deploy")
+        end
+
+        def unlock
+            MCProvision.info("Removing lock file on node")
+            request("unlock_deploy")
+        end
+
         # Check if the lock file exist
         def locked?
             MCProvision.info("Checking if the deploy is locked on this node")

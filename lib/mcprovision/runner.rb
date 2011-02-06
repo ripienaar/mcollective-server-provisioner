@@ -44,18 +44,18 @@ module MCProvision
         # Main provisioner body, does the following:
         #
         # - Find the node ip address based on target/ipaddress_fact
-        # - Checks if the node is locked for provisioning
-        # - Creates a lock file on the node so no other provisioner threads will interfere with it
         # - picks a puppet master based on configured criteria
         # - determines the ip address of the picked master
+        # - creates a lock file on the node so no other provisioner threads will interfere with it
         # - calls to the set_puppet_hostname action which typically adds 'puppet' to /etc/hosts
         # - checks if the node already has a cert
         #   - if it doesnt
-        #     - clean the cert from all puppetmasters
+        #     - clean the cert from all masters
         #     - instructs the client to do a run which would request the cert
-        #     - signs it on the chosen master
+        #     - signs it on all masters
         # - call puppet_bootstrap_stage which could run a small bootstrap environment client
         # - call puppet_final_run which would do a normal puppet run, this steps block till completed
+        # - deletes the lock file
         # - sends a notification to administrators
         def provision(node)
             node_inventory = node.inventory
@@ -63,7 +63,6 @@ module MCProvision
             master_ipaddress_fact = @config.settings["master"]["ipaddress_fact"] || "ipaddress"
 
             raise "Could not determine node ip address from fact #{node_ipaddress_fact}" unless node_inventory[:facts].include?(node_ipaddress_fact)
-            raise "Node already being provisioned" if node.locked?
 
             steps = @config.settings["steps"].keys.select{|s| @config.settings["steps"][s] }
             MCProvision.info("Provisioning #{node.hostname} / #{node_inventory[:facts][node_ipaddress_fact]} with steps #{steps.join ' '}")
@@ -75,28 +74,24 @@ module MCProvision
 
             MCProvision.info("Provisioning node against #{chosen_master.hostname} / #{master_ip}")
 
-            # calls set_puppet_host
+            node.lock if @config.settings["steps"]["lock"]
+
             node.set_puppet_host(master_ip) if @config.settings["steps"]["set_puppet_hostname"]
 
             # Only do certificate management if the node is clean and doesnt already have a cert
             unless node.has_cert?
-                # calls clean on all puppetmasters
                 @master.clean_cert(node.hostname) if @config.settings["steps"]["clean_node_certname"]
 
-                # Gets the node to request a CSR
                 node.send_csr if @config.settings["steps"]["send_node_csr"]
 
-                # Sign it
                 @master.sign(node.hostname) if @config.settings["steps"]["sign_node_csr"]
             else
                 MCProvision.info("Skipping SSL certificate management for node - already has a cert")
             end
 
-            # Bootstrap it
             node.bootstrap if @config.settings["steps"]["puppet_bootstrap_stage"]
-
-            # Do final run
             node.run_puppet if @config.settings["steps"]["puppet_final_run"]
+            node.unlock if @config.settings["steps"]["unlock"]
 
             @notifier.notify("Provisioned #{node.hostname} against #{chosen_master.hostname}", "New Node") if @config.settings["steps"]["notify"]
         end
