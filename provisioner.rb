@@ -1,7 +1,6 @@
 #!/usr/bin/ruby
 
 require 'mcprovision'
-require 'pp'
 
 if ARGV.size > 0
     configfile = ARGV[0]

@@ -5,13 +5,10 @@ A tool that will take machines running mcollective and a small
 provisioning agent and bootstrap them through the process of
 running puppet.
 
-This is still young code and a work in progress.
-
 Logic Flow
 ----------
 
-Each node more or less go through the following steps given the
-config file:
+Each node more or less go through the following steps given the config file:
 
 	---
 	logfile: /var/log/mcprovision.log
@@ -26,7 +23,7 @@ config file:
 	  puppet_bootstrap_stage: true
 	  puppet_final_run: true
 	  unlock: true
-	  notify: false
+	  notify: true
 	master:
 	  criteria:
 	  - ec2_placement_region
@@ -66,9 +63,34 @@ To do this we re-use a lot of existing agents:
  1. You need to have angelia deployed and the node should run the angelia agent
  1. You need some angelia plugins the boxcar and gcal ones are opensource
 
- Customizing
- -----------
+Customizing
+-----------
 
- The basic flow is probably generic enough for most bootstrapping scenarios, cloud or non cloud, the specifics
- of the process should be captured in your agent.  There's a sample agent in the agent subdir
+The basic flow is probably generic enough for most bootstrapping scenarios, cloud or non cloud, the specifics
+of the process should be captured in your agent.  There's a sample agent in the agent subdir.
 
+You can enable and disable individual steps that doesn't fit your needs in the steps section of the config file
+
+Changelog
+---------
+
+- 2011/02/04 - Improved error handling
+- 2011/02/04 - Make the facts used to determine ip address connfigurable
+- 2011/02/04 - Log backtraces when run in debug mode
+- 2011/02/04 - Make the agent names for all the components configurable
+- 2011/02/06 - Check if a machine already has a cert and skip cert related steps if it does
+- 2011/02/06 - Optimise performance of obtaining the node inventory
+- 2011/02/06 - Add lock and unlock stepts
+- 2011/02/06 - Make the node code more DRY
+- 2011/02/06 - When notifying communicate with only 1 of the discovered nodes providing a notification service
+
+
+License
+-------
+
+Apache 2.0
+
+Contact
+-------
+
+Contact R.I.Pienaar <rip@devco.net> / @ripienaar / www.devco.net with questions

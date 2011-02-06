@@ -1,6 +1,7 @@
 require 'mcollective'
 require 'yaml'
 require 'logger'
+require 'pp'
 
 include MCollective::RPC
 
@@ -12,6 +13,8 @@ module MCProvision
     autoload :Util, "mcprovision/util"
     autoload :Runner, "mcprovision/runner"
     autoload :Notifier, "mcprovision/notifier"
+
+    VERSION = "1.0.0"
 
     def self.logfile(logfile, loglevel)
         @@logfile = logfile
@@ -25,6 +28,10 @@ module MCProvision
             else
                 @@logger.level = Logger::INFO
         end
+    end
+
+    def self.version
+        VERSION
     end
 
     def self.warn(msg)
