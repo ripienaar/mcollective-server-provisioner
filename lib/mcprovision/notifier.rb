@@ -28,6 +28,10 @@ module MCProvision
 
             @rpc = rpcclient(agent)
             @rpc.progress = false
+
+            # in environments with many notifiers running only speak to 1
+            @rpc.limit_targets = 1
+
             @rpc.filter = Util.parse_filter(agent, @config.settings["notify"]["filter"])
         end
     end
