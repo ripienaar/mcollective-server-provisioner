@@ -3,13 +3,15 @@ logfile: /dev/stderr
 loglevel: debug
 daemonize: false
 steps:
+  lock: true
   set_puppet_hostname: true
   clean_node_certname: true
   send_node_csr: true
   sign_node_csr: true
   puppet_bootstrap_stage: true
   puppet_final_run: true
-  notify: true
+  unlock: true
+  notify: false
 master:
   criteria:
   - ec2_placement_region

@@ -23,6 +23,14 @@ module MCProvision
             result
         end
 
+        # Do we already have a puppet cert?
+        def has_cert?
+            MCProvision.info("Finding out if we already have a certificate")
+            result = @node.custom_request("has_cert", {}, @hostname, {"identity" => @hostname})
+
+            result.first[:data][:has_cert]
+        end
+
         # sets the ip of the puppet master host using the
         # set_puppet_host action on the node
         def set_puppet_host(ipaddress)

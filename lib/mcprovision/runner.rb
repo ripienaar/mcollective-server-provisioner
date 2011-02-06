@@ -62,14 +62,19 @@ module MCProvision
             # calls set_puppet_host
             node.set_puppet_host(master_ip) if @config.settings["steps"]["set_puppet_hostname"]
 
-            # calls clean on all puppetmasters
-            @master.clean_cert(node.hostname) if @config.settings["steps"]["clean_node_certname"]
+            # Only do certificate management if the node is clean and doesnt already have a cert
+            unless node.has_cert?
+                # calls clean on all puppetmasters
+                @master.clean_cert(node.hostname) if @config.settings["steps"]["clean_node_certname"]
 
-            # Gets the node to request a CSR
-            node.send_csr if @config.settings["steps"]["send_node_csr"]
+                # Gets the node to request a CSR
+                node.send_csr if @config.settings["steps"]["send_node_csr"]
 
-            # Sign it
-            @master.sign(node.hostname) if @config.settings["steps"]["sign_node_csr"]
+                # Sign it
+                @master.sign(node.hostname) if @config.settings["steps"]["sign_node_csr"]
+            else
+                MCProvision.info("Skipping SSL certificate management for node - already has a cert")
+            end
 
             # Bootstrap it
             node.bootstrap if @config.settings["steps"]["puppet_bootstrap_stage"]
