@@ -5,22 +5,19 @@ module MCollective
                      :description => "Agent to assist in provisioning new servers",
                      :author => "R.I.Pienaar",
                      :license => "Apache 2.0",
-                     :version => "1.1",
-                     :url => "http://mcollective-plugins.googlecode.com/",
+                     :version => "2.0",
+                     :url => "http://www.devco.net/",
                      :timeout => 360
 
 
-            # basic server inventory
-            action "inventory" do
-                ::Facter.reset
+            def startup_hook
+                config = Config.instance
 
-                reply[:facts] = PluginManager["facts_plugin"].get_facts
-                reply[:classes] = []
+                certname = PluginManager["facts_plugin"].get_fact("fqdn")
+                certname = config.identity unless certname
 
-                cfile = Config.instance.classesfile
-                if File.exist?(cfile)
-                    reply[:classes] = File.readlines(cfile).map {|i| i.chomp}
-                end
+                @puppetcert = config.pluginconf["provision.certfile"] || "/var/lib/puppet/ssl/certs/#{certname}.pem"
+                @lockfile = config.pluginconf["provision.lockfile"] || "/tmp/mcollective_provisioner_lock"
             end
 
             action "set_puppet_host" do
@@ -63,6 +60,37 @@ module MCollective
                 reply[:exitcode] = $?.exitstatus
 
                 fail "Puppet returned #{reply[:exitcode]}" if reply[:exitcode] != 0
+            end
+
+            action "has_cert" do
+                reply[:has_cert] = has_cert?
+            end
+
+            action "lock_deploy" do
+                File.open(@lockfile, "w") {|f| f.puts Time.now}
+
+                reply[:lockfile] = @lockfile
+
+                reply.fail! "Failed to lock the install" unless locked?
+            end
+
+            action "is_locked" do
+                reply[:locked] = locked?
+            end
+
+            action "unlock_deploy" do
+                File.unlink(@lockfile)
+                reply[:unlocked] = locked?
+                reply.fail! "Failed to unlock the install" if locked?
+            end
+
+            private
+            def has_cert?
+                File.exist?(@puppetcert)
+            end
+
+            def locked?
+                File.exist?(@lockfile)
             end
         end
     end

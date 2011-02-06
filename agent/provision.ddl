@@ -66,3 +66,10 @@ action "is_locked", :description => "Determine if the install is currently locke
            :description => "Is the install locked",
            :display_as => "Locked"
 end
+
+action "unlock_deploy", :description => "Unlock the deploy" do
+    output :unlocked,
+           :description => "Has the file been unlocked",
+           :display_as => "Unlocked"
+end
+

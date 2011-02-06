@@ -41,15 +41,31 @@ module MCProvision
             end
         end
 
+        # Main provisioner body, does the following:
+        #
+        # - Find the node ip address based on target/ipaddress_fact
+        # - Checks if the node is locked for provisioning
+        # - Creates a lock file on the node so no other provisioner threads will interfere with it
+        # - picks a puppet master based on configured criteria
+        # - determines the ip address of the picked master
+        # - calls to the set_puppet_hostname action which typically adds 'puppet' to /etc/hosts
+        # - checks if the node already has a cert
+        #   - if it doesnt
+        #     - clean the cert from all puppetmasters
+        #     - instructs the client to do a run which would request the cert
+        #     - signs it on the chosen master
+        # - call puppet_bootstrap_stage which could run a small bootstrap environment client
+        # - call puppet_final_run which would do a normal puppet run, this steps block till completed
+        # - sends a notification to administrators
         def provision(node)
             node_inventory = node.inventory
             node_ipaddress_fact = @config.settings["target"]["ipaddress_fact"] || "ipaddress"
             master_ipaddress_fact = @config.settings["master"]["ipaddress_fact"] || "ipaddress"
 
             raise "Could not determine node ip address from fact #{node_ipaddress_fact}" unless node_inventory[:facts].include?(node_ipaddress_fact)
+            raise "Node already being provisioned" if node.locked?
 
             steps = @config.settings["steps"].keys.select{|s| @config.settings["steps"][s] }
-
             MCProvision.info("Provisioning #{node.hostname} / #{node_inventory[:facts][node_ipaddress_fact]} with steps #{steps.join ' '}")
 
             chosen_master, master_inventory = pick_master_from(@config.settings["master"]["criteria"], node_inventory[:facts])
@@ -63,7 +79,7 @@ module MCProvision
             node.set_puppet_host(master_ip) if @config.settings["steps"]["set_puppet_hostname"]
 
             # Only do certificate management if the node is clean and doesnt already have a cert
-            unless node_inventory[:has_cert]
+            unless node.has_cert?
                 # calls clean on all puppetmasters
                 @master.clean_cert(node.hostname) if @config.settings["steps"]["clean_node_certname"]
 
