@@ -1,6 +1,6 @@
 module MCProvision
     class Node
-        attr_reader :hostname
+        attr_reader :hostname, :inventory
 
         def initialize(hostname, config, agent)
             @config = config
@@ -8,19 +8,7 @@ module MCProvision
             @agent = agent
 
             setup
-        end
-
-        # Gets the inventory from the discovery agent on the node
-        def inventory
-            result = {}
-
-            @node.client.req("inventory", "discovery", @node.client.options, 1) do |resp|
-                result[:agents] = resp[:body][:agents]
-                result[:facts] = resp[:body][:facts]
-                result[:classes] = resp[:body][:classes]
-            end
-
-            result
+            @inventory = fetch_inventory
         end
 
         # Do we already have a puppet cert?
@@ -72,6 +60,20 @@ module MCProvision
                     raise "Puppet failed due to #{$1} skipped resource(s)" unless $1 == "0"
                 end
             end
+        end
+
+        # Gets the inventory from the discovery agent on the node
+        def fetch_inventory
+            result = {}
+
+            @node.client.req("inventory", "discovery", @node.client.options, 1) do |resp|
+                result[:agents] = resp[:body][:agents]
+                result[:facts] = resp[:body][:facts]
+                result[:classes] = resp[:body][:classes]
+                result[:has_cert] = resp[:body][:has_cert]
+            end
+
+            result
         end
 
         def setup

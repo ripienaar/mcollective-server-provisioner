@@ -63,7 +63,7 @@ module MCProvision
             node.set_puppet_host(master_ip) if @config.settings["steps"]["set_puppet_hostname"]
 
             # Only do certificate management if the node is clean and doesnt already have a cert
-            unless node.has_cert?
+            unless node_inventory[:has_cert]
                 # calls clean on all puppetmasters
                 @master.clean_cert(node.hostname) if @config.settings["steps"]["clean_node_certname"]
 

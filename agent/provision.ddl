@@ -7,18 +7,6 @@ metadata :name => "Server Provisioning Agent",
 	 :timeout => 360
 
 
-action "inventory", :description => "Get the server inventory" do
-	display	:always
-
-	output :facts,
-	       :description => "Node Facts",
-	       :display_as  => "Facts"
-
-	output :classes,
-	       :description => "Classes on this node",
-	       :display_as  => "Classes"
-end
-
 action "set_puppet_host", :description => "Update /etc/hosts with the master IP" do
 	display	:always
 
