@@ -18,6 +18,7 @@ module MCollective
 
                 @puppetcert = config.pluginconf["provision.certfile"] || "/var/lib/puppet/ssl/certs/#{certname}.pem"
                 @lockfile = config.pluginconf["provision.lockfile"] || "/tmp/mcollective_provisioner_lock"
+                @puppetd = config.pluginconf["provision.puppetd"] || "/usr/sbin/puppetd"
             end
 
             action "set_puppet_host" do
@@ -40,7 +41,7 @@ module MCollective
 
             # does a run of puppet with --tags no_such_tag_here
             action "request_certificate" do
-                reply[:output] = %x[/usr/sbin/puppetd --test --tags no_such_tag_here --color=none --summarize]
+                reply[:output] = %x[#{@puppetd} --test --tags no_such_tag_here --color=none --summarize]
                 reply[:exitcode] = $?.exitstatus
 
                 # dont fail here if exitcode isnt 0, it'll always be non zero
@@ -48,18 +49,18 @@ module MCollective
 
             # does a run of puppet with --environment bootstrap or similar
             action "bootstrap_puppet" do
-                reply[:output] = %x[/usr/sbin/puppetd --test --environment bootstrap --color=none --summarize]
+                reply[:output] = %x[#{@puppetd} --test --environment bootstrap --color=none --summarize]
                 reply[:exitcode] = $?.exitstatus
 
-                fail "Puppet returned #{reply[:exitcode]}" if reply[:exitcode] != 0
+                fail "Puppet returned #{reply[:exitcode]}" if reply[:exitcode] != 2
             end
 
             # does a normal puppet run
             action "run_puppet" do
-                reply[:output] = %x[/usr/sbin/puppetd --test --color=none --summarize]
+                reply[:output] = %x[#{@puppetd} --test --color=none --summarize]
                 reply[:exitcode] = $?.exitstatus
 
-                fail "Puppet returned #{reply[:exitcode]}" if reply[:exitcode] != 0
+                fail "Puppet returned #{reply[:exitcode]}" if reply[:exitcode] != 2
             end
 
             action "has_cert" do
