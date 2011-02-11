@@ -26,6 +26,10 @@ module MCProvision::Util
             STDOUT.reopen('/dev/null', 'a')
             STDERR.reopen('/dev/null', 'a')
 
+            if File.directory?("/var/run")
+                File.open("/var/run/mcprovision.pid", 'w') {|f| f.write(Process.pid) } rescue true
+            end
+
             yield
         end
     end

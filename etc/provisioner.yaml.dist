@@ -1,0 +1,30 @@
+---
+logfile: /var/log/mcprovision.log
+loglevel: debug
+daemonize: true
+steps:
+  lock: false
+  set_puppet_hostname: false
+  clean_node_certname: false
+  send_node_csr: false
+  sign_node_csr: false
+  puppet_bootstrap_stage: false
+  puppet_final_run: false
+  unlock: false
+  notify: false
+master:
+  criteria:
+  - ec2_placement_region
+  - country
+  filter: ""
+  agent: puppetca
+  ipaddress_fact: ipaddress
+target:
+  filter: ""
+  agent: provision
+  ipaddress_fact: ipaddress
+notify:
+  filter: "/monitor1/"
+  agent: angelianotify
+  targets:
+  - boxcar://rip@devco.net
