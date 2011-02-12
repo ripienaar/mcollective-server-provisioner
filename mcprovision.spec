@@ -15,8 +15,17 @@ Requires: mcollective-client
 Packager: R.I.Pienaar <rip@devco.net>
 BuildArch: noarch
 
+%package agent
+Summary: MCollective Provisioner Agent
+Group: System Tools
+Requires: ruby
+Requires: mcollective
+
 %description
 Automated the provisioning of servers in a Puppet environment via MCollective
+
+%description agent
+Agent providing services for the MCollective Server Provisioner
 
 %prep
 %setup -q
@@ -30,9 +39,12 @@ rm -rf %{buildroot}
 %{__install} -d -m0755  %{buildroot}/usr/sbin
 %{__install} -d -m0755  %{buildroot}/etc/init.d
 %{__install} -d -m0755  %{buildroot}/etc/sysconfig
+%{__install} -d -m0755  %{buildroot}/usr/libexec/mcollective/mcollective/agent
 %{__install} -m0755 mcprovision.rb %{buildroot}/usr/sbin/mcprovision
 %{__install} -m0755 mcprovision.init %{buildroot}/etc/init.d/mcprovision
 %{__install} -m0644 etc/provisioner.yaml.dist %{buildroot}/etc/mcollective/mcprovision.yaml
+%{__install} -m0644 agent/provision.ddl %{buildroot}/usr/libexec/mcollective/mcollective/agent/provision.ddl
+%{__install} -m0644 agent/provision.rb %{buildroot}/usr/libexec/mcollective/mcollective/agent/provision.rb
 %{__install} -m0600 etc/mcprovision.defaults %{buildroot}/etc/sysconfig/mcprovision
 cp -R lib/* %{buildroot}/%{ruby_sitelib}/
 
@@ -55,6 +67,9 @@ if [ "$1" -ge 1 ]; then
 fi;
 :;
 
+%files agent
+/usr/libexec/mcollective/mcollective/agent/provision.rb
+
 %files
 %{ruby_sitelib}/mcprovision.rb
 %{ruby_sitelib}/mcprovision
@@ -62,6 +77,7 @@ fi;
 %config(noreplace) /etc/sysconfig/mcprovision
 /etc/init.d/mcprovision
 /usr/sbin/mcprovision
+/usr/libexec/mcollective/mcollective/agent/provision.ddl
 
 
 %changelog
