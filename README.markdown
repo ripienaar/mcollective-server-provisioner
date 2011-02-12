@@ -14,6 +14,7 @@ Each node more or less go through the following steps given the config file:
 	logfile: /var/log/mcprovision.log
 	loglevel: debug
 	daemonize: true
+	sleeptime: 10
 	steps:
 	  lock: true
 	  set_puppet_hostname: true

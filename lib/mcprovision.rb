@@ -18,7 +18,7 @@ module MCProvision
 
     def self.logfile(logfile, loglevel)
         @@logfile = logfile
-        @@logger = Logger.new(logfile, 5, 10240)
+        @@logger = Logger.new(logfile, 5, 102400)
 
         case loglevel
             when "debug"

@@ -30,7 +30,7 @@ module MCProvision
                         end
                     end
 
-                    sleep 5
+                    sleep @config.settings["sleeptime"] || 5
                 end
             rescue SignalException => e
             rescue Exception => e
@@ -112,21 +112,24 @@ module MCProvision
             end
 
             # For every configured fact
-            facts.each do |fact|
-                # Check if the node has it
-                if node.include?(fact)
-                    # Now check every master
-                    masters.each do |master|
-                        master_facts = master_inventories[master.hostname][:facts]
-                        if master_facts.include?(fact)
-                            # if they match, we have a winner
-                            if master_facts[fact] == node[fact]
-                                MCProvision.info("Picking #{master.hostname} for puppetmaster based on #{fact} == #{node[fact]}")
-                                chosen_master = master
+            begin
+                facts.each do |fact|
+                    # Check if the node has it
+                    if node.include?(fact)
+                        # Now check every master
+                        masters.each do |master|
+                            master_facts = master_inventories[master.hostname][:facts]
+                            if master_facts.include?(fact)
+                                # if they match, we have a winner
+                                if master_facts[fact] == node[fact]
+                                    MCProvision.info("Picking #{master.hostname} for puppetmaster based on #{fact} == #{node[fact]}")
+                                    chosen_master = master
+                                end
                             end
                         end
                     end
                 end
+            rescue
             end
 
             raise "Could not find any masters" if chosen_master.nil?
