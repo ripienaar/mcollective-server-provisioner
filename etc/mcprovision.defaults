@@ -1,0 +1,5 @@
+export MCOLLECTIVE_AES_PRIVATE=/etc/mcollective/mcprovision-private.pem
+export MCOLLECTIVE_AES_PUBLIC=/etc/mcollective/mcprovision.pem
+export STOMP_USER=mcprovision
+export STOMP_PASSWORD=secret
+export STOMP_SERVER=stomp
