@@ -1,0 +1,17 @@
+description "mcollective server provisioner"
+author "Marc Cluet <marc.cluet@ubuntu.com>"
+
+pre-start script
+   if [ ! -f "/etc/mcollective/provisioner.yaml" ]
+   then
+       logger "provisioner.rb: Config file missing, please consult examples on how to create one"
+       exit 1
+   fi
+end script
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+respawn
+
+env RUBYLIB=/usr/local/lib/site_ruby/1.8:$RUBYLIB
+exec /usr/bin/mcprovision.rb

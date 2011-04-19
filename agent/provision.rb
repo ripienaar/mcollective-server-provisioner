@@ -8,17 +8,19 @@ module MCollective
                      :version => "2.0",
                      :url => "http://www.devco.net/",
                      :timeout => 360
-
+                     :timeout => 60
 
             def startup_hook
                 config = Config.instance
 
                 certname = PluginManager["facts_plugin"].get_fact("fqdn")
+                certname = PluginManager["facts_plugin"].get_fact("hostname").downcase
                 certname = config.identity unless certname
 
                 @puppetcert = config.pluginconf["provision.certfile"] || "/var/lib/puppet/ssl/certs/#{certname}.pem"
                 @lockfile = config.pluginconf["provision.lockfile"] || "/tmp/mcollective_provisioner_lock"
                 @puppetd = config.pluginconf["provision.puppetd"] || "/usr/sbin/puppetd"
+                @fact_add = config.pluginconf["provision.fact_add"] || "/usr/bin/fact-add"
             end
 
             action "set_puppet_host" do
@@ -39,32 +41,89 @@ module MCollective
                 end
             end
 
+            # Adds a new fact
+            action "fact_mod" do
+                validate :fact, :value
+
+                reply[:exitcode] = run("#{@fact_add} #{request[:fact]} #{request[:value]}", :stdout => :output, :stderr => :err, :chomp => true)
+
+                if reply[:exitcode] != 0
+                    File.unlink(@lockfile)
+                    fail "Fact returned #{reply[:exitcode]}"
+                end
+            end
+
             # does a run of puppet with --tags no_such_tag_here
             action "request_certificate" do
-                reply[:output] = %x[#{@puppetd} --test --tags no_such_tag_here --color=none --summarize]
-                reply[:exitcode] = $?.exitstatus
-
+                reply[:exitcode] = run("#{@puppetd} --test --tags no_such_tag_here --color=none --summarize", :stdout => :output, :stderr => :err, :chomp => true)
+                reply[:exitcode] = 0
                 # dont fail here if exitcode isnt 0, it'll always be non zero
             end
 
             # does a run of puppet with --environment bootstrap or similar
             action "bootstrap_puppet" do
-                reply[:output] = %x[#{@puppetd} --test --environment bootstrap --color=none --summarize]
-                reply[:exitcode] = $?.exitstatus
+                reply[:exitcode] = run("#{@puppetd} --test --environment bootstrap --color=none --summarize", :stdout => :output, :stderr => :err, :chomp => true)
 
-                fail "Puppet returned #{reply[:exitcode]}" if reply[:exitcode] != 2
+                if reply[:exitcode] == 1
+                    File.unlink(@lockfile)
+                    fail "Puppet returned #{reply[:exitcode]}"
+                end
             end
 
             # does a normal puppet run
             action "run_puppet" do
-                reply[:output] = %x[#{@puppetd} --test --color=none --summarize]
-                reply[:exitcode] = $?.exitstatus
+                reply[:exitcode] = run("#{@puppetd} --test --color=none --summarize", :stdout => :output, :stderr => :err, :chomp => true)
+                reply[:exitcode] = 0
+            end
 
-                fail "Puppet returned #{reply[:exitcode]}" if reply[:exitcode] != 2
+            # start puppet
+            action "start_puppet" do
+                reply[:exitcode] = run("service puppet start", :stdout => :output, :stderr => :err, :chomp => true)
+
+                if reply[:exitcode] != 0
+                    File.unlink(@lockfile)
+                    fail "Puppet returned #{reply[:exitcode]}"
+                end
+            end
+
+            # cycle_puppet_run
+            action "cycle_puppet_run" do
+                reply[:exitcode] = run("#{@puppetd} --test --color=none --summarize; #{@puppetd} --test --color=none --summarize; #{@puppetd} --test --color=none --summarize", :stdout => :output, :stderr => :err, :chomp => true)
+                reply[:exitcode] = 0
+                # Even if this errors (it will), we don't care
+            end
+ 
+            # stop puppet
+            action "stop_puppet" do
+                reply[:exitcode] = run("service puppet stop", :stdout => :output, :stderr => :err, :chomp => true)
+
+                if reply[:exitcode] != 0
+                    File.unlink(@lockfile)
+                    fail "Puppet returned #{reply[:exitcode]}"
+                end
+            end
+
+            # clean client cert
+            action "clean_cert" do
+                reply[:exitcode] = run("find /var/lib/puppet/ssl -type f -exec rm {} \+ ", :stdout => :output, :stderr => :err, :chomp => true)
+
+                if reply[:exitcode] != 0
+                    File.unlink(@lockfile)
+                    fail "find returned #{reply[:exitcode]}"
+                end
             end
 
             action "has_cert" do
                 reply[:has_cert] = has_cert?
+            end
+
+            action "provisioned" do
+                isprovisioned = PluginManager["facts_plugin"].get_fact("provision-status")
+                if isprovisioned == "provisioned"
+                    reply[:provisioned] = true
+                else
+                    reply[:provisioned] = false
+                end 
             end
 
             action "lock_deploy" do

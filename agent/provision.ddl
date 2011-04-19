@@ -5,7 +5,7 @@ metadata :name => "Server Provisioning Agent",
 	 :version => "1.1",
 	 :url => "http://mcollective-plugins.googlecode.com/",
 	 :timeout => 360
-
+	 :timeout => 60
 
 action "set_puppet_host", :description => "Update /etc/hosts with the master IP" do
 	display	:always
@@ -49,10 +49,26 @@ action "run_puppet", :description => "Runs Puppet in the normal environment" do
 	       :display_as  => "Exit Code"
 end
 
+action "cycle_puppet_run", :description => "Runs Puppet cycle" do
+	output :output,
+	       :description => "cycle_puppet_run Output",
+	       :display_as  => "Output"
+
+	output :exitcode,
+	       :description => "cycle_puppet_run Exit Code",
+	       :display_as  => "Exit Code"
+end
+
 action "has_cert", :description => "Finds out if we already have a Puppet certificate" do
     output :has_cert,
            :description => "Have a puppet certificate already been created",
            :display_as => "Has Certificate"
+end
+
+action "provisioned", :description => "Finds out if we already are provisioned" do
+    output :provisioned,
+           :description => "Is the server provisioned",
+           :display_as => "Is Provisioned"
 end
 
 action "lock_deploy", :description => "Lock the deploy so new ones can not be started" do
@@ -71,5 +87,61 @@ action "unlock_deploy", :description => "Unlock the deploy" do
     output :unlocked,
            :description => "Has the file been unlocked",
            :display_as => "Unlocked"
+end
+
+action "clean_cert", :description => "Clean client cert" do
+	output :output,
+	       :description => "clean_cert Output",
+	       :display_as  => "Output"
+
+	output :exitcode,
+	       :description => "clean_cert Exit Code",
+	       :display_as  => "Exit Code"
+end
+
+action "stop_puppet", :description => "Stop puppet" do
+	output :output,
+	       :description => "stop_puppet Output",
+	       :display_as  => "Output"
+
+	output :exitcode,
+	       :description => "stop_puppet Exit Code",
+	       :display_as  => "Exit Code"
+end
+
+action "start_puppet", :description => "Start puppet" do
+	output :output,
+	       :description => "start_puppet Output",
+	       :display_as  => "Output"
+
+	output :exitcode,
+	       :description => "start_puppet Exit Code",
+	       :display_as  => "Exit Code"
+end
+
+action "fact_mod", :description => "Fact Mod" do
+  	input :fact,
+          :prompt      => "Fact",
+          :description => "Fact Name",
+          :type        => :string,
+          :validation  => '.',
+          :optional    => false,
+          :maxlength   => 90
+
+    input :value,
+          :prompt      => "Value",
+          :description => "Value Name",
+          :type        => :string,
+          :validation  => '.',
+          :optional    => false,
+          :maxlength   => 90
+
+	output :output,
+	       :description => "fact_mod Output",
+	       :display_as  => "Output"
+
+	output :exitcode,
+	       :description => "fact_mod Exit Code",
+	       :display_as  => "Exit Code"
 end
 

@@ -62,36 +62,56 @@ module MCProvision
             node_ipaddress_fact = @config.settings["target"]["ipaddress_fact"] || "ipaddress"
             master_ipaddress_fact = @config.settings["master"]["ipaddress_fact"] || "ipaddress"
 
-            raise "Could not determine node ip address from fact #{node_ipaddress_fact}" unless node_inventory[:facts].include?(node_ipaddress_fact)
+            begin
+                raise "Could not determine node ip address from fact #{node_ipaddress_fact}" unless node_inventory[:facts].include?(node_ipaddress_fact)
+            rescue StandardError => e
+                raise "Node didn't reply on allocated time"
+            end
 
             steps = @config.settings["steps"].keys.select{|s| @config.settings["steps"][s] }
-            MCProvision.info("Provisioning #{node.hostname} / #{node_inventory[:facts][node_ipaddress_fact]} with steps #{steps.join ' '}")
 
             chosen_master, master_inventory = pick_master_from(@config.settings["master"]["criteria"], node_inventory[:facts])
 
-            raise "Could not determine master ip address from fact #{master_ipaddress_fact}" unless master_inventory[:facts].include?(master_ipaddress_fact)
+            begin
+                raise "Could not determine master ip address from fact #{master_ipaddress_fact}" unless master_inventory[:facts].include?(master_ipaddress_fact)
+            rescue StandardError => e
+                raise "Node didn't reply on allocated time"
+            end
+
             master_ip = master_inventory[:facts][master_ipaddress_fact]
 
-            MCProvision.info("Provisioning node against #{chosen_master.hostname} / #{master_ip}")
-
-            node.lock if @config.settings["steps"]["lock"]
-
-            node.set_puppet_host(master_ip) if @config.settings["steps"]["set_puppet_hostname"]
-
+            MCProvision.info("Potential provisioning for #{node.hostname}")
             # Only do certificate management if the node is clean and doesnt already have a cert
             unless node.has_cert?
-                @master.clean_cert(node.hostname) if @config.settings["steps"]["clean_node_certname"]
+                MCProvision.info("Provisioning #{node.hostname} / #{node_inventory[:facts][node_ipaddress_fact]} with steps #{steps.join ' '}")
+                MCProvision.info("Provisioning node against #{chosen_master.hostname} / #{master_ip}")
+                node.lock if @config.settings["steps"]["lock"]
+
+                node.stop_puppet if @config.settings["steps"]["stop_puppet"]
+                
+                node.set_puppet_host(master_ip) if @config.settings["steps"]["set_puppet_hostname"]
+
+                node.clean_cert if @config.settings["steps"]["clean_node_certname"]
+
+                @master.clean_cert(node.hostname.downcase) if @config.settings["steps"]["clean_node_certname"]
 
                 node.send_csr if @config.settings["steps"]["send_node_csr"]
 
-                @master.sign(node.hostname) if @config.settings["steps"]["sign_node_csr"]
-            else
-                MCProvision.info("Skipping SSL certificate management for node - already has a cert")
-            end
+                @master.sign(node.hostname.downcase) if @config.settings["steps"]["sign_node_csr"]
 
-            node.bootstrap if @config.settings["steps"]["puppet_bootstrap_stage"]
-            node.run_puppet if @config.settings["steps"]["puppet_final_run"]
-            node.unlock if @config.settings["steps"]["unlock"]
+                node.cycle_puppet_run if @config.settings["steps"]["cycle_puppet_run"]
+                node.bootstrap if @config.settings["steps"]["puppet_bootstrap_stage"]
+                node.run_puppet if @config.settings["steps"]["puppet_final_run"]
+
+                node.start_puppet if @config.settings["steps"]["start_puppet"]
+
+                node.fact_mod("provision-status","provisioned") if @config.settings["steps"]["set_role_provisioned"]
+
+                node.unlock if @config.settings["steps"]["unlock"]
+                MCProvision.info("Node #{node.hostname} provisioned")
+            else
+                MCProvision.info("Node is already provisioned")
+            end
 
             @notifier.notify("Provisioned #{node.hostname} against #{chosen_master.hostname}", "New Node") if @config.settings["steps"]["notify"]
         end

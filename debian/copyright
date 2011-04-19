@@ -1,0 +1,22 @@
+Format-Specification: http://wiki.debian.org/Proposals/CopyrightFormat
+Upstream-Name: mCollective Server Provisioner
+Upstream-Maintainer: Marc Cluet <marc.cluet@canonical.com>
+Upstream-Source: https://github.com/ripienaar/mcollective-server-provisioner
+
+Files: etc/provisioner.yaml
+       provisioner.rb
+       lib/mcprovision.rb
+       lib/mcprovision/config.rb
+       lib/mcprovision/node.rb
+       lib/mcprovision/puppetmaster.rb
+       lib/mcprovision/nodes.rb
+       lib/mcprovision/util.rb
+       lib/mcprovision/notifier.rb
+       lib/mcprovision/runner.rb
+       agent/provision.ddl
+       agent/provision.rb
+       README.markdown
+
+Copyright: (C) 2010-2011 R.I.Pienaar <rip@devco.net>
+License: Apache 2.0
+ http://www.apache.org/licenses/LICENSE-2.0.html

@@ -1,16 +1,20 @@
 ---
-logfile: /dev/stderr
+logfile: /var/log/provision.log
 loglevel: debug
 daemonize: false
 steps:
-  lock: true
+  lock: false
+  stop_puppet: true
   set_puppet_hostname: true
   clean_node_certname: true
   send_node_csr: true
   sign_node_csr: true
-  puppet_bootstrap_stage: true
-  puppet_final_run: true
-  unlock: true
+  puppet_bootstrap_stage: false
+  puppet_final_run: false
+  start_puppet: true
+  set_role_provisioned: true
+  cycle_puppet_run: false
+  unlock: false
   notify: false
 master:
   criteria:

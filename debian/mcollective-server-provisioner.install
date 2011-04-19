@@ -1,0 +1,4 @@
+etc/provisioner.yaml  usr/share/mcollective-server-provisioner/examples
+lib/* usr/lib/ruby/1.8
+mcprovision.rb /usr/bin
+agent/*.ddl usr/share/mcollective/plugins/mcollective/agent

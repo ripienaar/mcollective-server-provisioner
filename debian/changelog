@@ -1,0 +1,177 @@
+mcollective-server-provisioner (0.0.0+git20110120-1ubuntu33) maverick; urgency=low
+
+  * Added fix for lowercase hostname 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Thu, 17 Mar 2011 09:07:06 -0700
+
+mcollective-server-provisioner (0.0.0+git20110120-1ubuntu32) maverick; urgency=low
+
+  * Added end of provisioning logging to avoid mistakes reading logs 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Tue, 15 Mar 2011 07:49:17 -0700
+
+mcollective-server-provisioner (0.0.0+git20110120-1ubuntu31) maverick; urgency=low
+
+  * Fixed code bugs 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Mon, 14 Mar 2011 07:36:10 -0700
+
+mcollective-server-provisioner (0.0.0+git20110120-1ubuntu30) maverick; urgency=low
+
+  * Updated agent and provisioner for mcollective 1.1.3
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Mon, 14 Mar 2011 06:13:17 -0700
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu29) maverick; urgency=low
+
+  * Be Smarter about catching errors 
+  * Reactivated locks
+
+ -- Marc Cluet <marc.cluet@canonical.com> Fri, 11 Mar 2011 03:56:42 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu28) maverick; urgency=low
+
+  * Disabled cycle_puppet_run option on default startup
+  * Added new log message for potential provisioning
+  * Lowered plugin timeout to 60 seconds 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Thu, 03 Mar 2011 15:35:56 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu27) maverick; urgency=low
+
+  * Raised timeout per operation to 1000 seconds instead of 260 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Thu, 03 Mar 2011 06:19:11 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu26) maverick; urgency=low
+
+  * Added ddl to server install 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Tue, 01 Mar 2011 13:33:08 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu25) maverick; urgency=low
+
+  * Added is provisioned flag 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Tue, 01 Mar 2011 11:55:14 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu24) maverick; urgency=low
+
+  * Added cycle_puppet_run to provisioner 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Tue, 01 Mar 2011 09:33:59 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu23) maverick; urgency=low
+
+  * Fixed several bugs 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Tue, 01 Mar 2011 08:42:12 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu22) maverick; urgency=low
+
+  * Added code for fact add 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Mon, 28 Feb 2011 19:47:37 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu21) maverick; urgency=low
+
+  * Fixed error codes on output 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Mon, 28 Feb 2011 14:57:24 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu20) maverick; urgency=low
+
+  * Fixed exit code on errorless agent outputs 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Mon, 28 Feb 2011 14:33:45 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu19) maverick; urgency=low
+
+  * Added new functions to provisioner 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Mon, 28 Feb 2011 14:08:15 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu14) maverick; urgency=low
+
+  * Sync code with last github version 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Mon, 28 Feb 2011 10:09:31 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu13) maverick; urgency=low
+
+  * New code for stopping puppet and cleaning client side cert
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Mon, 28 Feb 2011 09:57:48 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu12) maverick; urgency=low
+
+  * More upstart script fixes 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Sun, 27 Feb 2011 11:51:30 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu11) maverick; urgency=low
+
+  * Fixed upstart script 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Sun, 27 Feb 2011 11:10:40 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu10) maverick; urgency=low
+
+  * Moved config file to examples
+  * Added check in upstart to avoid starting with no config file 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Thu, 24 Feb 2011 10:15:25 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu9) maverick; urgency=low
+
+  * Added no start option 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Thu, 24 Feb 2011 07:29:54 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu8) maverick; urgency=low
+
+  * Modified default config file
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Mon, 07 Feb 2011 07:20:38 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu7) maverick; urgency=low
+
+  * Added upstart script for provisioner 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Mon, 07 Feb 2011 06:44:08 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu6) maverick; urgency=low
+
+  * Added file locking patch 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Mon, 07 Feb 2011 06:21:49 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu5) maverick; urgency=low
+
+  * Added RI Pienaar locking patches 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Mon, 07 Feb 2011 05:08:45 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu4) maverick; urgency=low
+
+  * Added changes coded at FOSDEM 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Mon, 07 Feb 2011 04:03:31 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu3) maverick; urgency=low
+
+  * Separate provisioner from plugin 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Tue, 01 Feb 2011 07:56:23 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu2) maverick; urgency=low
+
+  * Fixed installation path
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Wed, 26 Jan 2011 08:21:10 -0800
+
+mcollective-server-provisioner (0.0.0+git20110120-0ubuntu1) maverick; urgency=low
+
+  * Maverick build 
+
+ -- Marc Cluet <marc.cluet@canonical.com>  Wed, 26 Jan 2011 02:32:59 -0800

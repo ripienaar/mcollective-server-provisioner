@@ -37,6 +37,14 @@ module MCProvision
             result[:data][:has_cert]
         end
 
+        # Do we already have a puppet cert?
+        def provisioned?
+            MCProvision.info("Finding out if we already finished provisioning")
+            result = request("provisioned")
+
+            result[:data][:provisioned]
+        end
+
         # sets the ip of the puppet master host using the
         # set_puppet_host action on the node
         def set_puppet_host(ipaddress)
@@ -58,20 +66,59 @@ module MCProvision
             check_puppet_output(result[:data][:output].split("\n"))
         end
 
+        # calls the clean_cert to clean certificate on remote side
+        def clean_cert
+            MCProvision.info("Calling clean_cert")
+            result = request("clean_cert")
+        end
+
+        # calls stop_puppet to stop puppet service
+        def stop_puppet
+            MCProvision.info("Calling stop_puppet")
+            result = request("stop_puppet")
+        end
+
+        # calls start_puppet to start puppet service
+        def start_puppet
+            MCProvision.info("Calling start_puppet")
+            result = request("start_puppet")
+        end
+
         # Do the final run of the client by calling run_puppet
         def run_puppet
             MCProvision.info("Calling run_puppet")
             result = request("run_puppet")
-            check_puppet_output(result[:data][:output].split("\n"))
+        end
+
+        # Do cycle puppet run
+        def cycle_puppet_run
+            MCProvision.info("Calling cycle_puppet_run")
+            result = request("cycle_puppet_run")
+        end
+ 
+        # Modify or add facts to client
+        def fact_mod(fact,value)
+            MCProvision.info("Calling fact_add with fact #{fact} and value #{value}")
+            result = request("fact_mod", {:fact => fact, :value => value})
         end
 
         private
         # Wrapper that calls to a node, checks the result structure and status messages and return
         # the result structure for the node
         def request(action, arguments={})
-            result = @node.custom_request(action, arguments, @hostname, {"identity" => @hostname})
+            begin
+                result = @node.custom_request(action, arguments, @hostname, {"identity" => @hostname})
+            rescue StandardError => e
+                action = "unlock_deploy"
+                arguments = ""
+                @node.custom_request(action, arguments, @hostname, {"identity" => @hostname})
+            end
 
             raise "Uknown result from remote node: #{result.pretty_inspect}" unless result.is_a?(Array)
+
+            #MCProvision.info("debug response: #{result.pretty_inspect}"
+
+            raise "Did not receive a response from #{@hostname} in the allowed time" if result.empty?
 
             result = result.first
 
@@ -114,6 +161,7 @@ module MCProvision
             @node = rpcclient(@agent)
             @node.identity_filter @hostname
             @node.progress = false
+            #MCProvision.info(@node.options.pretty_inspect)
         end
     end
 end
