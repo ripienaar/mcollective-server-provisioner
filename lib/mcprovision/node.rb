@@ -88,10 +88,6 @@ module MCProvision
                 if o =~ /^\s+Failed: (\d+)/
                     raise "Puppet failed due to #{$1} failed resource(s)" unless $1 == "0"
                 end
-
-                if o =~ /^\s+Skipped: (\d+)/
-                    raise "Puppet failed due to #{$1} skipped resource(s)" unless $1 == "0"
-                end
             end
         end
 

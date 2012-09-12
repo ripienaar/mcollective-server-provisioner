@@ -52,7 +52,7 @@ module MCollective
                 reply[:output] = %x[#{@puppetd} --test --environment bootstrap --color=none --summarize]
                 reply[:exitcode] = $?.exitstatus
 
-                fail "Puppet returned #{reply[:exitcode]}" if reply[:exitcode] != 2
+                fail "Puppet returned #{reply[:exitcode]}" if [4,6].include?(reply[:exitcode])
             end
 
             # does a normal puppet run
@@ -60,7 +60,7 @@ module MCollective
                 reply[:output] = %x[#{@puppetd} --test --color=none --summarize]
                 reply[:exitcode] = $?.exitstatus
 
-                fail "Puppet returned #{reply[:exitcode]}" if reply[:exitcode] != 2
+                fail "Puppet returned #{reply[:exitcode]}" if [4,6].include?(reply[:exitcode])
             end
 
             action "has_cert" do
