@@ -4,8 +4,8 @@ module MCProvision::Util
         result = MCollective::Util.empty_filter
 
         filter.split(" ").each do |f|
-            if f =~ /^(.+?)=(.+)/
-                result["fact"] << {:fact => $1, :value => $2}
+            if f =~ /.+?=.+/
+                result["fact"] << MCollective::Util.parse_fact_string(f)
             else
                 result["cf_class"] << f
             end
