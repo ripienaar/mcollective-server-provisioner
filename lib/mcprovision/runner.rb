@@ -132,6 +132,11 @@ module MCProvision
       rescue
       end
 
+      unless chosen_master
+        chosen_master = masters.shuffle.first.hostname
+        MCProvision.info("Picking #{chosen_master} for puppetmaster based on random selection after no masters matched facts")
+      end
+
       raise "Could not find any masters" if chosen_master.nil?
 
       return [chosen_master, master_inventories[chosen_master.hostname]]
