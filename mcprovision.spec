@@ -40,11 +40,14 @@ rm -rf %{buildroot}
 %{__install} -d -m0755  %{buildroot}/etc/init.d
 %{__install} -d -m0755  %{buildroot}/etc/sysconfig
 %{__install} -d -m0755  %{buildroot}/usr/libexec/mcollective/mcollective/agent
+%{__install} -d -m0755  %{buildroot}/usr/libexec/mcollective/mcollective/data
 %{__install} -m0755 mcprovision.rb %{buildroot}/usr/sbin/mcprovision
 %{__install} -m0755 mcprovision.init %{buildroot}/etc/init.d/mcprovision
 %{__install} -m0644 etc/provisioner.yaml.dist %{buildroot}/etc/mcollective/mcprovision.yaml
 %{__install} -m0644 agent/provision.ddl %{buildroot}/usr/libexec/mcollective/mcollective/agent/provision.ddl
 %{__install} -m0644 agent/provision.rb %{buildroot}/usr/libexec/mcollective/mcollective/agent/provision.rb
+%{__install} -m0644 data/provision_data.ddl %{buildroot}/usr/libexec/mcollective/mcollective/data/provision_data.ddl
+%{__install} -m0644 data/provision_data.rb %{buildroot}/usr/libexec/mcollective/mcollective/data/provision_data.rb
 %{__install} -m0600 etc/mcprovision.defaults %{buildroot}/etc/sysconfig/mcprovision
 cp -R lib/* %{buildroot}/%{ruby_sitelib}/
 
@@ -69,6 +72,7 @@ fi;
 
 %files agent
 /usr/libexec/mcollective/mcollective/agent/provision.rb
+/usr/libexec/mcollective/mcollective/data/provision_data.rb
 
 %files
 %{ruby_sitelib}/mcprovision.rb
@@ -78,6 +82,7 @@ fi;
 /etc/init.d/mcprovision
 /usr/sbin/mcprovision
 /usr/libexec/mcollective/mcollective/agent/provision.ddl
+/usr/libexec/mcollective/mcollective/data/provision_data.ddl
 
 
 %changelog
