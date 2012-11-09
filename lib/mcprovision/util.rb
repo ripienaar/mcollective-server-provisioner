@@ -2,7 +2,7 @@ module MCProvision::Util
   # Parses a -S style filter and return a std filter option
   def self.parse_filter(agent, filter)
     result = MCollective::Util.empty_filter
-    result["compound"] <<  MCollective::Matcher.create_compound_callstack(filter) if filter.nil? || filter == ""
+    result["compound"] <<  MCollective::Matcher.create_compound_callstack(filter) unless filter.nil? || filter == ""
     result["agent"] << agent
 
     result
