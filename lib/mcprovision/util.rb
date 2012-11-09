@@ -1,16 +1,8 @@
 module MCProvision::Util
-  # Parses a -W style filter and return a std filter option
+  # Parses a -S style filter and return a std filter option
   def self.parse_filter(agent, filter)
     result = MCollective::Util.empty_filter
-
-    filter.split(" ").each do |f|
-      if f =~ /.+?=.+/
-        result["fact"] << MCollective::Util.parse_fact_string(f)
-      else
-        result["cf_class"] << f
-      end
-    end
-
+    result["compound"] <<  MCollective::Matcher.create_compound_callstack(filter) if filter.nil? || filter == ""
     result["agent"] << agent
 
     result

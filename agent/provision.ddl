@@ -1,10 +1,10 @@
-metadata :name => "Server Provisioning Agent",
-	 :description => "Agent to assist in provisioning new servers",
-	 :author => "R.I.Pienaar",
-	 :license => "Apache 2.0",
-	 :version => "1.1",
-	 :url => "http://mcollective-plugins.googlecode.com/",
-	 :timeout => 360
+metadata :name => "provision",
+         :description => "Agent to assist in provisioning new servers",
+         :author => "R.I.Pienaar",
+         :license => "Apache 2.0",
+         :version => "1.1",
+         :url => "http://mcollective-plugins.googlecode.com/",
+         :timeout => 360
 
 
 action "set_puppet_host", :description => "Update /etc/hosts with the master IP" do
@@ -59,6 +59,18 @@ action "lock_deploy", :description => "Lock the deploy so new ones can not be st
     output :lockfile,
            :description => "The file that got created",
            :display_as => "Lock file"
+end
+
+action "disable_provisioner", :description => "Completely disable the provisioner" do
+    output :disablefile,
+           :description => "The file that got created",
+           :display_as => "Lock file"
+end
+
+action "is_disabled", :description => "Determine if the install is currently disabled" do
+    output :disabled,
+           :description => "Is the install disabled",
+           :display_as => "Disabled"
 end
 
 action "is_locked", :description => "Determine if the install is currently locked" do

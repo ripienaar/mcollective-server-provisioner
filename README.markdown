@@ -23,7 +23,6 @@ Each node more or less go through the following steps given the config file:
 	  sign_node_csr: true
 	  puppet_bootstrap_stage: true
 	  puppet_final_run: true
-	  unlock: true
 	  notify: true
 	master:
 	  criteria:
@@ -54,7 +53,7 @@ Each node more or less go through the following steps given the config file:
   1. Signs the certificate on all masters
  1. Does an initial puppet run with the 'bootstrap_puppet' action
  1. Does a 2nd puppet run via 'run_puppet' action.  This should remove the provision agent from the node
- 1. Removes the lock file on the node
+ 1. Disable the agent preventing it from being discovered in future
  1. Notifies my iPhone via boxcar
 
 To do this we re-use a lot of existing agents:
@@ -68,13 +67,16 @@ Customizing
 -----------
 
 The basic flow is probably generic enough for most bootstrapping scenarios, cloud or non cloud, the specifics
-of the process should be captured in your agent.  There's a sample agent in the agent subdir.
+of the process should be captured in your agent.  There's a sample agent in the agent subdir. You will need
+to customise the agent for your specific scenario.
 
 You can enable and disable individual steps that doesn't fit your needs in the steps section of the config file
 
 Changelog
 ---------
 
+- 2012/11/09 - Add a data plugin that reports locking and disabled status
+- 2012/11/09 - Add a disable lock file
 - 2011/02/04 - Improved error handling
 - 2011/02/04 - Make the facts used to determine ip address connfigurable
 - 2011/02/04 - Log backtraces when run in debug mode

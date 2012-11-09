@@ -1,15 +1,20 @@
 module MCollective
   module Agent
     class Provision<RPC::Agent
+      activate_when do
+        !File.exist?(Config.instance.pluginconf.fetch("provision.disablefile", "/etc/mcollective/provisioner.disable"))
+      end
+
       def startup_hook
         config = Config.instance
 
         certname = PluginManager["facts_plugin"].get_fact("fqdn")
         certname = config.identity unless certname
 
-        @puppetcert = config.pluginconf["provision.certfile"] || "/var/lib/puppet/ssl/certs/#{certname}.pem"
-        @lockfile = config.pluginconf["provision.lockfile"] || "/tmp/mcollective_provisioner_lock"
-        @puppetd = config.pluginconf["provision.puppetd"] || "/usr/sbin/puppetd"
+        @puppetcert = config.pluginconf.fetch("provision.certfile", "/var/lib/puppet/ssl/certs/#{certname}.pem")
+        @lockfile = config.pluginconf.fetch("provision.lockfile", "/etc/mcollective/provisioner.lock")
+        @disablefile = config.pluginconf.fetch("provision.disablefile", "/etc/mcollective/provisioner.disable")
+        @puppetd = config.pluginconf.fetch("provision.puppetd", "/usr/sbin/puppetd")
       end
 
       action "set_puppet_host" do
@@ -78,9 +83,26 @@ module MCollective
         reply.fail! "Failed to unlock the install" if locked?
       end
 
+      action "disable_provisioner" do
+        reply.fail! "Already disabled" if disabled?
+
+        File.open(@disablefile, "w") {|f| f.puts Time.now}
+        reply[:disablefile] = @disablefile
+
+        reply.fail! "Failed to disable the provisioner" unless disabled?
+      end
+
+      action "is_disabled" do
+        reply[:disabled] = disabled?
+      end
+
       private
       def has_cert?
         File.exist?(@puppetcert)
+      end
+
+      def disabled?
+        File.exist?(@disablefile)
       end
 
       def locked?

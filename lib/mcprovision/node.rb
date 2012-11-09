@@ -11,6 +11,11 @@ module MCProvision
       @inventory = fetch_inventory
     end
 
+    def disable
+      MCProvision.info("Creating disable lock file on node")
+      request("disable_provisioner")
+    end
+
     def lock
       MCProvision.info("Creating lock file on node")
       request("lock_deploy")

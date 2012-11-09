@@ -10,7 +10,6 @@ steps:
   sign_node_csr: true
   puppet_bootstrap_stage: true
   puppet_final_run: true
-  unlock: true
   notify: false
 master:
   criteria:
@@ -20,7 +19,7 @@ master:
   agent: puppetca
   ipaddress_fact: ipaddress
 target:
-  filter: ""
+  filter: "provision().disabled=false and provision().locked=false"
   agent: provision
   ipaddress_fact: ipaddress
 notify:

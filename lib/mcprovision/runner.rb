@@ -55,7 +55,7 @@ module MCProvision
     #     - signs it on all masters
     # - call puppet_bootstrap_stage which could run a small bootstrap environment client
     # - call puppet_final_run which would do a normal puppet run, this steps block till completed
-    # - deletes the lock file
+    # - disables the provisioner
     # - sends a notification to administrators
     def provision(node)
       node_inventory = node.inventory
@@ -91,7 +91,7 @@ module MCProvision
 
       node.bootstrap if @config.settings["steps"]["puppet_bootstrap_stage"]
       node.run_puppet if @config.settings["steps"]["puppet_final_run"]
-      node.unlock if @config.settings["steps"]["unlock"]
+      node.disable
 
       @notifier.notify("Provisioned #{node.hostname} against #{chosen_master.hostname}", "New Node") if @config.settings["steps"]["notify"]
     end
@@ -102,6 +102,9 @@ module MCProvision
     # till we find a match, else return the first one.
     def pick_master_from(facts, node)
       masters = @master.find_all
+
+      raise "No masters found" if masters.empty?
+
       chosen_master = masters.first
 
       master_inventories = {}
@@ -130,11 +133,6 @@ module MCProvision
           end
         end
       rescue
-      end
-
-      unless chosen_master
-        chosen_master = masters.shuffle.first.hostname
-        MCProvision.info("Picking #{chosen_master} for puppetmaster based on random selection after no masters matched facts")
       end
 
       raise "Could not find any masters" if chosen_master.nil?
