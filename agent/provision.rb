@@ -14,7 +14,7 @@ module MCollective
         @puppetcert = config.pluginconf.fetch("provision.certfile", "/var/lib/puppet/ssl/certs/#{certname}.pem")
         @lockfile = config.pluginconf.fetch("provision.lockfile", "/etc/mcollective/provisioner.lock")
         @disablefile = config.pluginconf.fetch("provision.disablefile", "/etc/mcollective/provisioner.disable")
-        @puppetd = config.pluginconf.fetch("provision.puppetd", "/usr/sbin/puppetd")
+        @puppet = config.pluginconf.fetch("provision.puppet", "/usr/bin/puppet agent")
       end
 
       action "set_puppet_host" do
@@ -37,7 +37,7 @@ module MCollective
 
       # does a run of puppet with --tags no_such_tag_here
       action "request_certificate" do
-        reply[:output] = %x[#{@puppetd} --test --tags no_such_tag_here --color=none --summarize]
+        reply[:output] = %x[#{@puppet} --test --tags no_such_tag_here --color=none --summarize]
         reply[:exitcode] = $?.exitstatus
 
         # dont fail here if exitcode isnt 0, it'll always be non zero
@@ -45,7 +45,7 @@ module MCollective
 
       # does a run of puppet with --environment bootstrap or similar
       action "bootstrap_puppet" do
-        reply[:output] = %x[#{@puppetd} --test --environment bootstrap --color=none --summarize]
+        reply[:output] = %x[#{@puppet} --test --environment bootstrap --color=none --summarize]
         reply[:exitcode] = $?.exitstatus
 
         fail "Puppet returned #{reply[:exitcode]}" if [4,6].include?(reply[:exitcode])
@@ -53,7 +53,7 @@ module MCollective
 
       # does a normal puppet run
       action "run_puppet" do
-        reply[:output] = %x[#{@puppetd} --test --color=none --summarize]
+        reply[:output] = %x[#{@puppet} --test --color=none --summarize]
         reply[:exitcode] = $?.exitstatus
 
         fail "Puppet returned #{reply[:exitcode]}" if [4,6].include?(reply[:exitcode])
