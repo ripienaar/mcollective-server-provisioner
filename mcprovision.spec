@@ -12,11 +12,19 @@ Source0: %{name}-%{version}.tgz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: ruby
 Requires: mcollective-client
+Requires: mcprovision-common = %{version}-%{release}
 Packager: R.I.Pienaar <rip@devco.net>
 BuildArch: noarch
 
 %package agent
 Summary: MCollective Provisioner Agent
+Group: System Tools
+Requires: ruby
+Requires: mcollective
+Requires: mcprovision-common = %{version}-%{release}
+
+%package common
+Summary: MCollective Provisioner common files
 Group: System Tools
 Requires: ruby
 Requires: mcollective
@@ -26,6 +34,9 @@ Automated the provisioning of servers in a Puppet environment via MCollective
 
 %description agent
 Agent providing services for the MCollective Server Provisioner
+
+%description common
+Common files needed for both the provisioner agent and server
 
 %prep
 %setup -q
@@ -74,6 +85,10 @@ fi;
 /usr/libexec/mcollective/mcollective/agent/provision.rb
 /usr/libexec/mcollective/mcollective/data/provision_data.rb
 
+%files common
+/usr/libexec/mcollective/mcollective/agent/provision.ddl
+/usr/libexec/mcollective/mcollective/data/provision_data.ddl
+
 %files
 %{ruby_sitelib}/mcprovision.rb
 %{ruby_sitelib}/mcprovision
@@ -81,8 +96,6 @@ fi;
 %config(noreplace) /etc/sysconfig/mcprovision
 /etc/init.d/mcprovision
 /usr/sbin/mcprovision
-/usr/libexec/mcollective/mcollective/agent/provision.ddl
-/usr/libexec/mcollective/mcollective/data/provision_data.ddl
 
 
 %changelog
