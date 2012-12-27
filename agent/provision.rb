@@ -58,6 +58,14 @@ module MCollective
 
         fail "Puppet returned #{reply[:exitcode]}" if [4,6].include?(reply[:exitcode])
       end
+      
+      # runs puppet as a daemon
+      action "daemonize_puppet" do
+        reply[:output] = %x[#{@puppet}]
+        reply[:exitcode] = $?.exitstatus
+
+        fail "Puppet returned #{reply[:exitcode]}" if [4,6].include?(reply[:exitcode])
+      end
 
       action "has_cert" do
         reply[:has_cert] = has_cert?

@@ -91,6 +91,7 @@ module MCProvision
 
       node.bootstrap if @config.settings["steps"]["puppet_bootstrap_stage"]
       node.run_puppet if @config.settings["steps"]["puppet_final_run"]
+      node.daemonize_puppet if @config.settings["steps"]["puppet_daemon"]
       node.disable
 
       @notifier.notify("Provisioned #{node.hostname} against #{chosen_master.hostname}", "New Node") if @config.settings["steps"]["notify"]
