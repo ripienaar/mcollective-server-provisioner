@@ -11,7 +11,7 @@ module MCollective
         certname = PluginManager["facts_plugin"].get_fact("fqdn")
         certname = config.identity unless certname
 
-        @puppetcert = config.pluginconf.fetch("provision.certfile", "/var/lib/puppet/ssl/certs/#{certname}.pem")
+        @puppetcert = config.pluginconf.fetch("provision.certfile", "/var/lib/puppet/ssl/certs/#{certname.downcase}.pem")
         @lockfile = config.pluginconf.fetch("provision.lockfile", "/etc/mcollective/provisioner.lock")
         @disablefile = config.pluginconf.fetch("provision.disablefile", "/etc/mcollective/provisioner.disable")
         @puppet = config.pluginconf.fetch("provision.puppet", "/usr/bin/puppet agent")
