@@ -61,7 +61,7 @@ module MCollective
       
       # runs puppet as a daemon
       action "daemonize_puppet" do
-        reply[:output] = %x[#{@puppet}]
+        reply[:output] = %x[#{@puppet} --onetime]
         reply[:exitcode] = $?.exitstatus
 
         fail "Puppet returned #{reply[:exitcode]}" if [4,6].include?(reply[:exitcode])
