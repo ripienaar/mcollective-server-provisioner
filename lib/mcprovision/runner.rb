@@ -80,17 +80,18 @@ module MCProvision
 
       # Only do certificate management if the node is clean and doesnt already have a cert
       unless node.has_cert?
-        @master.clean_cert(node.hostname) if @config.settings["steps"]["clean_node_certname"]
+        @master.clean_cert(node.hostname.downcase) if @config.settings["steps"]["clean_node_certname"]
 
         node.send_csr if @config.settings["steps"]["send_node_csr"]
 
-        @master.sign(node.hostname) if @config.settings["steps"]["sign_node_csr"]
+        @master.sign(node.hostname.downcase) if @config.settings["steps"]["sign_node_csr"]
       else
         MCProvision.info("Skipping SSL certificate management for node - already has a cert")
       end
 
       node.bootstrap if @config.settings["steps"]["puppet_bootstrap_stage"]
       node.run_puppet if @config.settings["steps"]["puppet_final_run"]
+      node.daemonize_puppet if @config.settings["steps"]["puppet_daemon"]
       node.disable
 
       @notifier.notify("Provisioned #{node.hostname} against #{chosen_master.hostname}", "New Node") if @config.settings["steps"]["notify"]

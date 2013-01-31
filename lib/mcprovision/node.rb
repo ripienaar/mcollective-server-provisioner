@@ -69,6 +69,12 @@ module MCProvision
       result = request("run_puppet")
       check_puppet_output(result[:data][:output].split("\n"))
     end
+    
+    # Run puppet as a daemon on the client by calling daemonize_puppet
+    def daemonize_puppet
+      MCProvision.info("Calling daemonize_puppet")
+      result = request("daemonize_puppet")
+    end
 
     private
     # Wrapper that calls to a node, checks the result structure and status messages and return
