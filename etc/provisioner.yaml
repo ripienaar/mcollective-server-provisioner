@@ -10,6 +10,7 @@ steps:
   sign_node_csr: true
   puppet_bootstrap_stage: true
   puppet_final_run: true
+  puppet_daemonize: false
   notify: false
 master:
   criteria:

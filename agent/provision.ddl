@@ -49,6 +49,16 @@ action "run_puppet", :description => "Runs Puppet in the normal environment" do
 	       :display_as  => "Exit Code"
 end
 
+action "daemonize_puppet", :description => "Runs Puppet as a daemon in the normal environment" do
+	output :output,
+	       :description => "Puppetd Output",
+	       :display_as  => "Output"
+
+	output :exitcode,
+	       :description => "Puppetd Exit Code",
+	       :display_as  => "Exit Code"
+end
+
 action "has_cert", :description => "Finds out if we already have a Puppet certificate" do
     output :has_cert,
            :description => "Have a puppet certificate already been created",
